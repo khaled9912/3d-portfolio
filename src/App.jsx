@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 const App = () => {
   return (
     <main className="bg-slate-300/20">
+        {console.log('inside app component')}
         <Router>
             <Navbar/>
             <Routes>
