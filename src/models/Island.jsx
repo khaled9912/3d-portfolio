@@ -13,11 +13,87 @@ import { a } from '@react-spring/three'
 
 import islandScene from '../assets/3d/island.glb'
 
-const Island = (props) =>  {
+const Island = ({ isRotating, setIsRotating, ...props}) =>  {
   const islandRef = useRef();
 
+  const { gl, viewport } = useThree()
   const { nodes, materials } = useGLTF(islandScene)
-  return (
+  
+  const lastX = useRef(0) // to fing the last mouse position
+  const rotationSpeed = useRef(0)
+  const dampingFactor = 0.95; // this is going to control the island how the fast is it when you scroll
+
+  const handlePointerDown = (e) => {
+      e.stopProgation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
+      e.preventDefault(); // to prevent from reloading the page or doing anything like that.
+      setIsRotating(true);
+      // when it touch we need to know where it is comming from a phone or tablet
+      const clientX = e.touches 
+        ? e.touches[0].clientX 
+        : e.clientX;
+        lastX.current = clientX ;
+
+    }
+    const handlePointerUp = (e) => {
+      e.stopProgation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
+      e.preventDefault(); // to prevent from reloading the page or doing anything like that.
+      setIsRotating(false);
+      // when it touch we need to know where it is comming from a phone or tablet
+      const clientX = e.touches 
+        ? e.touches[0].clientX 
+        : e.clientX;
+        lastX.current = clientX ;
+        //calculate the change 
+        const delta = (clientX - lastX.current) / viewport.width;
+
+        islandRef.current.rotationy += delta * 0.01 * Math.PI;
+
+        lastX.current = clientX;
+        
+        
+    }
+    const handlePointerMove = (e) => {
+      e.stopProgation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
+      e.preventDefault(); // to prevent from reloading the page or doing anything like that.
+      setIsRotating(true);
+
+        if(isRotating) handlePointerUp(e) ; 
+    }
+    const handleKeyDown = (e) => {
+      if(e.key == 'ArrowLeft') {
+        if(!isRotating)  setIsRotating(true);
+        islandRef.current.rotation.y += 0.01 * Math.PI;
+      } else if(e.key == 'ArrowRight') {
+          if(!isRotating)  setIsRotating(true);
+          islandRef.current.rotation.y -= 0.01 * Math.PI;
+        }
+    }
+
+    const  handleKeyUp =  (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        setIsRotating(false);
+      }
+    }
+
+
+    useEffect( () => {
+        document.addEventListener('pointerdown', handlePointerDown);
+        document.addEventListener('pointerup', handlePointerUp); 
+        document.addEventListener('pointermove', handlePointerMove); 
+        document.addEventListener('keydown', handleKeyDown); 
+        document.addEventListener('keyup', handleKeyUp); 
+
+
+        return () => {//removing events from the canvas once we cancel the page.
+          document.removeEventListener('pointerdown', handlePointerDown);
+          document.removeEventListener('pointerup', handlePointerUp); 
+          document.removeEventListener('pointerMove', handlePointerMove); 
+          document.removeEventListener('keydown', handleKeyDown); 
+          document.removeEventListener('keyup', handleKeyUp); 
+        }
+
+    }, [gl, handlePointerDown, handlePointerMove, handlePointerUp]) 
+    return (
     // I have added a to be animated.
     <a.group ref={islandRef} {...props} > 
       <mesh
