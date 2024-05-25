@@ -24,7 +24,7 @@ const Island = ({ isRotating, setIsRotating, ...props}) =>  {
   const dampingFactor = 0.95; // this is going to control the island how the fast is it when you scroll
 
   const handlePointerDown = (e) => {
-      e.stopProgation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
+      e.stopPropagation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
       e.preventDefault(); // to prevent from reloading the page or doing anything like that.
       setIsRotating(true);
       // when it touch we need to know where it is comming from a phone or tablet
@@ -35,7 +35,7 @@ const Island = ({ isRotating, setIsRotating, ...props}) =>  {
 
     }
     const handlePointerUp = (e) => {
-      e.stopProgation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
+      e.stopPropagation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
       e.preventDefault(); // to prevent from reloading the page or doing anything like that.
       setIsRotating(false);
       // when it touch we need to know where it is comming from a phone or tablet
@@ -53,7 +53,7 @@ const Island = ({ isRotating, setIsRotating, ...props}) =>  {
         
     }
     const handlePointerMove = (e) => {
-      e.stopProgation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
+      e.stopPropagation();  // it is going to prevent to touch any other func when you touch the screen unless this func.
       e.preventDefault(); // to prevent from reloading the page or doing anything like that.
       setIsRotating(true);
 
@@ -74,8 +74,12 @@ const Island = ({ isRotating, setIsRotating, ...props}) =>  {
         setIsRotating(false);
       }
     }
+    // this hook is going to apply on every single frame
+    useFrame(() => {
+      if(!isRotating) {
 
-
+      }
+    })
     useEffect( () => {
         document.addEventListener('pointerdown', handlePointerDown);
         document.addEventListener('pointerup', handlePointerUp); 
